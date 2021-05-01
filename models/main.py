@@ -91,7 +91,11 @@ def main():
     c, t = calc_counts(ticker, prediction, test_frame['text'])
 
     print("\n===== Accuracy for " + str(ticker) + " =====")
-    print("Accuracy: %i / %i = %.4f " % (c, t, c/t))
+
+    if (t == 0):
+        print("No sentences were found containing the ticker: " + ticker)
+    else:
+        print("Accuracy: %i / %i = %.4f " % (c, t, c/t))
 
     print("\nTime for training and test: %.2f seconds" % (time.time() - start_time))
 
