@@ -1,6 +1,8 @@
 from nltk.tokenize import regexp_tokenize
 import numpy as np
 
+# This whole file was provided to me
+
 # Here is a default pattern for tokenization, you can substitue it with yours
 default_pattern =  r"""(?x)                  
                         (?:[A-Z]\.)+          
@@ -22,7 +24,7 @@ def tokenize(text, pattern = default_pattern):
     Returns:
         list -- list of tokenized words, such as ['I', 'love', 'nlp']
     """
-    text = text.lower()
+    text = str(text).lower()
     return regexp_tokenize(text, pattern)
 
 
@@ -91,38 +93,6 @@ class UnigramFeature(FeatureExtractor):
             features.append(self.transform(text_set[i]))
         return np.array(features)
             
-
-class BigramFeature(FeatureExtractor):
-    """Bigram feature extractor analogous to the unigram one.
-    """
-    def __init__(self):
-        # Add your code here!
-        raise Exception("Must be implemented")
-    def fit(self, text_set):
-        # Add your code here!
-        raise Exception("Must be implemented")
-    def transform(self, text):
-        # Add your code here!
-        raise Exception("Must be implemented")
-    def transform_list(self, text_set):
-        # Add your code here!
-        raise Exception("Must be implemented")
-
-class CustomFeature(FeatureExtractor):
-    """customized feature extractor, such as TF-IDF
-    """
-    def __init__(self):
-        # Add your code here!
-        raise Exception("Must be implemented")
-    def fit(self, text_set):
-        # Add your code here!
-        raise Exception("Must be implemented")
-    def transform(self, text):
-        # Add your code here!
-        raise Exception("Must be implemented")
-    def transform_list(self, text_set):
-        # Add your code here!
-        raise Exception("Must be implemented")
 
 
         

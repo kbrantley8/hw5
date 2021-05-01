@@ -5,52 +5,60 @@ import numpy as np
 import time
 import argparse
 
+#python main.py --model LogisticRegression
 
+# provided to me
 def accuracy(pred, labels):
     correct = (np.array(pred) == np.array(labels)).sum()
     accuracy = correct/len(pred)
     print("Accuracy: %i / %i = %.4f " %(correct, len(pred), correct/len(pred)))
 
-
+# provided to me
 def read_data(path):
-    train_frame = pd.read_csv(path + 'train.csv')
+    train_frame = pd.read_csv(path + 'kory_data.csv')
 
     # You can form your test set from train set
     # We will use our test set to evaluate your model
     try:
-        test_frame = pd.read_csv(path + 'test.csv')
+        test_frame = pd.read_csv(path + 'kory_test.csv')
     except:
         test_frame = train_frame
 
     return train_frame, test_frame
 
 
+# written by Kory Brantley
+def calc_counts(ticker, predictions, frame):
+    total = 0
+    count = 0
+    for x in range(0, len(predictions)):
+        pred = predictions[x]
+        sentence = frame[x]
+        if ticker in sentence:
+            total = total + 1
+            if pred == 1:
+                count = count + 1
+
+    return count, total
+        
+
+# provided to me
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--model', '-m', type=str, default='AlwaysPredictZero',
-                        choices=['AlwaysPredictZero', 'NaiveBayes', 'LogisticRegression'])
-    parser.add_argument('--feature', '-f', type=str, default='unigram',
-                        choices=['unigram', 'bigram', 'customized'])
-    parser.add_argument('--path', type=str, default = './data/', help='path to datasets')
-    args = parser.parse_args()
-    print(args)
 
-    train_frame, test_frame = read_data(args.path)
+    flag = True
+    while(flag):
+        ticker = input("Enter stock ticker: ")
+        if (type(ticker) == str):
+            flag = False
 
-    # Convert text into features
-    if args.feature == "unigram":
-        feat_extractor = UnigramFeature()
-    elif args.feature == "bigram":
-        feat_extractor = BigramFeature()
-    elif args.feature == "customized":
-        feat_extractor = CustomFeature()
-    else:
-        raise Exception("Pass unigram, bigram or customized to --feature")
+    print("Starting classification:")
+    train_frame, test_frame = read_data('./data/')
 
+    feat_extractor = UnigramFeature()
     # Tokenize text into tokens
     tokenized_text = []
     for i in range(0, len(train_frame['text'])):
-        tokenized_text.append(tokenize(train_frame['text'][i]))
+        tokenized_text.append(tokenize(str(train_frame['text'][i])))
 
     feat_extractor.fit(tokenized_text)
 
@@ -67,30 +75,27 @@ def main():
     Y_test = test_frame['label']
 
 
-    if args.model == "AlwaysPredictZero":
-        model = AlwaysPreditZero()
-    elif args.model == "NaiveBayes":
-        model = NaiveBayesClassifier()
-    elif args.model == "LogisticRegression":
-        model = LogisticRegressionClassifier()
-    else:
-        raise Exception("Pass AlwaysPositive, NaiveBayes, LogisticRegression to --model")
-
+    model = LogisticRegressionClassifier()
 
     start_time = time.time()
     model.fit(X_train,Y_train)
     print("===== Train Accuracy =====")
-    accuracy(model.predict(X_train), Y_train)
+    prediction = model.predict(X_train)
+    accuracy(prediction, Y_train)
     
     print("===== Test Accuracy =====")
-    accuracy(model.predict(X_test), Y_test)
+    prediction = model.predict(X_test)
+    accuracy(prediction, Y_test)
 
-    if (args.model == "NaiveBayes"):
-        model.getImportantTen(feat_extractor.unigram)
+    # written by Kory Brantley
+    c, t = calc_counts(ticker, prediction, test_frame['text'])
 
-    print("Time for training and test: %.2f seconds" % (time.time() - start_time))
+    print("\n===== Accuracy for " + str(ticker) + " =====")
+    print("Accuracy: %i / %i = %.4f " % (c, t, c/t))
+
+    print("\nTime for training and test: %.2f seconds" % (time.time() - start_time))
 
 
-
+# provided to me
 if __name__ == '__main__':
     main()
